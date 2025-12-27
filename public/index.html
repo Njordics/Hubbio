@@ -1,0 +1,1052 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubbio Stremio Addon</title>
+    <style>
+      :root {
+        --bg: #0f1116;
+        --panel: #171a21;
+        --accent: #4fd1c5;
+        --accent-strong: #38b2ac;
+        --text: #e8ecf2;
+        --muted: #9ba4b5;
+        --border: #222733;
+        --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at 20% 20%, rgba(79, 209, 197, 0.12), transparent 25%),
+          radial-gradient(circle at 80% 0%, rgba(56, 178, 172, 0.1), transparent 30%),
+          var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px;
+      }
+      .card {
+        width: min(960px, 100%);
+        background: linear-gradient(135deg, rgba(23, 26, 33, 0.94), rgba(15, 17, 22, 0.96));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        padding: 28px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 18px;
+        margin-bottom: 18px;
+      }
+      h1 { margin: 0; font-size: 24px; letter-spacing: 0.5px; }
+      .tag {
+        background: rgba(79, 209, 197, 0.15);
+        color: var(--accent);
+        border: 1px solid rgba(79, 209, 197, 0.35);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+      .row { display: grid; gap: 14px; }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+      }
+      .tab {
+        border: 1px solid var(--border);
+        background: #0b0d12;
+        color: var(--text);
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .tab.active {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .tab-panel { display: none; }
+      .tab-panel.active { display: grid; }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+      }
+      .label { color: var(--muted); font-size: 13px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+      .code {
+        background: #0b0d12;
+        border: 1px solid #1f2330;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+        font-size: 14px;
+        color: var(--text);
+        word-break: break-all;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      button, a.button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--text);
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        box-shadow: 0 10px 30px rgba(79, 209, 197, 0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      }
+      button.secondary, a.secondary {
+        background: transparent;
+        border: 1px solid var(--border);
+        box-shadow: none;
+        color: var(--text);
+      }
+      button.danger {
+        background: transparent;
+        border: 1px solid #70333a;
+        color: #f4838a;
+        box-shadow: none;
+      }
+      button:hover, a.button:hover { transform: translateY(-1px); filter: brightness(1.02); }
+      button:active, a.button:active { transform: translateY(0); }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+      .list { display: grid; gap: 10px; }
+      .pill {
+        padding: 10px 12px;
+        background: #0b0d12;
+        border: 1px solid #1f2330;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 10px;
+        font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+        color: var(--text);
+        overflow: hidden;
+      }
+      .pill .pill-text {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        padding-bottom: 2px;
+      }
+      .pill .pill-text::-webkit-scrollbar { height: 6px; }
+      .pill .pill-text::-webkit-scrollbar-thumb { background: #2a3040; border-radius: 999px; }
+      .pill .pill-text::-webkit-scrollbar-track { background: #12151c; }
+      .pill-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .pill .pill-action { flex-shrink: 0; white-space: nowrap; }
+      .muted { color: var(--muted); }
+      .note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+      }
+      .cache-card {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #141824, #0d0f15);
+        border: 1px solid var(--border);
+        min-height: 160px;
+      }
+      .cache-card .bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        filter: brightness(0.6);
+        opacity: 0.8;
+      }
+      .cache-card .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+      }
+      .cache-card .content {
+        position: relative;
+        z-index: 1;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .cache-card .title { font-weight: 700; }
+      .cache-card .meta { color: var(--muted); font-size: 13px; }
+      .cache-card .actions { margin-top: auto; }
+      .stream-list { display: grid; gap: 10px; }
+      .stream-item {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        background: #0b0d12;
+      }
+      .stream-item .title { font-weight: 700; }
+      .stream-item .meta { color: var(--muted); font-size: 12px; word-break: break-all; }
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .summary-card {
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #0b0d12;
+      }
+      .summary-card .title { font-weight: 700; font-size: 14px; }
+      .summary-card .value { font-size: 22px; font-weight: 700; }
+      .table {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .table-head, .table-row {
+        display: grid;
+        grid-template-columns: 140px 120px 80px 1fr 90px;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+      .table-head { background: #0b0d12; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+      .table-row { border-top: 1px solid #1f2330; font-size: 13px; }
+      form {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr;
+      }
+      input, textarea, select {
+        width: 100%;
+        background: #0b0d12;
+        border: 1px solid #1f2330;
+        border-radius: 10px;
+        padding: 12px 14px;
+        color: var(--text);
+        font-size: 14px;
+        outline: none;
+      }
+      input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(79, 209, 197, 0.35); }
+      .pill strong { font-weight: 700; }
+      .inline { display: flex; gap: 10px; flex-wrap: wrap; }
+      .inline input { flex: 1; min-width: 200px; }
+      .inline select { min-width: 160px; }
+      @media (max-width: 640px) {
+        header { flex-direction: column; align-items: flex-start; }
+        .code { flex-direction: column; align-items: flex-start; }
+        .pill { flex-direction: column; align-items: flex-start; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <header>
+        <div>
+          <h1>Hubbio Stremio Addon</h1>
+        </div>
+        <div class="tag">Streams-only (v0.1.0)</div>
+      </header>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="dashboard">Dashboard</button>
+        <button class="tab" data-tab="addons">Addons</button>
+        <button class="tab" data-tab="inbuilt">In-Built</button>
+        <button class="tab" data-tab="timeline">Timeline</button>
+        <button class="tab" data-tab="cached">Cached</button>
+        <button class="tab" data-tab="logs">Logs</button>
+        <button class="tab" data-tab="config">Config</button>
+      </div>
+
+      <section class="row tab-panel active" data-tab-panel="dashboard">
+        <div class="panel">
+          <div class="label">Manifest URL</div>
+          <div class="code" id="manifestBox">
+            <span id="manifestUrl">Loading...</span>
+            <div class="actions">
+              <button id="copyManifest" type="button">Copy</button>
+              <a id="stremioInstall" class="button" href="#" aria-label="Install in Stremio">Open in Stremio</a>
+            </div>
+          </div>
+          <div class="note">Stremio uses the manifest URL to install the addon.</div>
+        </div>
+
+        <div class="panel">
+          <div class="label">Sample Stream IDs</div>
+          <div class="list">
+            <div class="pill">
+              <span>hubbio:sample-movie</span>
+              <span class="muted">MP4 demo</span>
+            </div>
+            <div class="pill">
+              <span>hubbio:sample-hls</span>
+              <span class="muted">HLS demo</span>
+            </div>
+          </div>
+          <div class="note">Paste one of these IDs in Stremio to test playback.</div>
+        </div>
+
+      </section>
+
+      <section class="row tab-panel" data-tab-panel="addons">
+        <div class="panel">
+          <div class="label">Install External Scraper / Addon</div>
+          <form id="addonForm">
+            <div class="inline">
+              <input id="addonName" name="name" type="text" placeholder="Optional name (e.g., MediaFusion)" />
+              <input
+                id="addonUrl"
+                name="url"
+                type="text"
+                placeholder="Paste stremio:// or https:// manifest URL"
+                required
+                aria-label="Addon URL"
+              />
+              <select id="addonCategory" name="category" aria-label="Addon category">
+                <option value="streams">Streams</option>
+                <option value="catalog">Catalog</option>
+                <option value="meta">Meta</option>
+                <option value="subtitles">Subtitles</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <button type="submit">Add to Hubbio</button>
+            <div class="note">
+              Works with links like
+              <span class="muted">
+                stremio://torrentio.strem.fun/qualityfilter=.../manifest.json
+              </span>
+              we normalize to https and store the manifest URL.
+            </div>
+            <div id="addonMsg" class="note" aria-live="polite"></div>
+          </form>
+          <div class="label" style="margin-top: 14px;">Installed Addons</div>
+          <div id="addonList" class="list"></div>
+        </div>
+      </section>
+
+      <section class="row tab-panel" data-tab-panel="inbuilt">
+        <div class="panel">
+          <div class="label">In-Built Catalogs</div>
+          <div class="note" style="margin-bottom: 8px;">Streaming giants: recently added / popular TV & movies. Toggle to expose catalogs.</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="enableAllBuiltins" type="button" class="secondary">Enable All</button>
+            <button id="disableAllBuiltins" type="button" class="secondary">Disable All</button>
+          </div>
+          <div id="inbuiltList" class="list"></div>
+        </div>
+      </section>
+
+      <section class="row tab-panel" data-tab-panel="timeline">
+        <div class="panel">
+          <div class="label">Timeline</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="refreshRecent" type="button" class="secondary">Refresh</button>
+          </div>
+          <div id="timelineSummary" class="summary-grid"></div>
+          <div class="label" style="margin-top: 10px;">Recently Requested</div>
+          <div id="recentList" class="grid"></div>
+          <div class="label" style="margin-top: 14px;">Recent Errors</div>
+          <div id="timelineErrors" class="table">
+            <div class="table-head">
+              <div>Time</div>
+              <div>IP</div>
+              <div>Method</div>
+              <div>Path</div>
+              <div>Status</div>
+            </div>
+            <div id="timelineErrorsBody"></div>
+          </div>
+          <div class="note">Shows most recent stream requests and stats across Hubbio.</div>
+        </div>
+      </section>
+
+      <section class="row tab-panel" data-tab-panel="cached">
+        <div class="panel">
+          <div class="label">Cached Streams</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="refreshCache" type="button" class="secondary">Refresh</button>
+          </div>
+          <div class="label">TV</div>
+          <div id="cacheListTv" class="grid"></div>
+          <div class="label" style="margin-top: 8px;">Movies</div>
+          <div id="cacheListMovie" class="grid"></div>
+          <div class="note">Cached streams are returned first; Hubbio skips querying external addons when cached results exist.</div>
+        </div>
+        <div class="panel" id="cacheDetailPanel" style="display: none;">
+          <div class="label">Cached Streams Detail</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="backFromCacheDetail" type="button" class="secondary">Back</button>
+          </div>
+          <div id="cacheDetailTitle" class="title"></div>
+          <div id="cacheDetailMeta" class="meta" style="margin-bottom: 10px;"></div>
+          <div id="cacheDetailList" class="stream-list"></div>
+        </div>
+      </section>
+
+      <section class="row tab-panel" data-tab-panel="logs">
+        <div class="panel">
+          <div class="label">Logs</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="refreshLogs" type="button" class="secondary">Refresh</button>
+            <button id="clearLogs" type="button" class="danger">Clear</button>
+            <label style="display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px;">
+              <input id="liveLogs" type="checkbox" style="width: 14px; height: 14px;" />
+              Live
+            </label>
+          </div>
+          <div id="logList" class="list"></div>
+          <div class="note">Shows recent requests, cache hits, addon fetches, errors, and debug info.</div>
+        </div>
+      </section>
+
+      <section class="row tab-panel" data-tab-panel="config">
+        <div class="panel">
+          <div class="label">TMDB API Key</div>
+          <form id="configForm">
+            <input
+              id="tmdbKey"
+              name="tmdbApiKey"
+              type="text"
+              placeholder="Paste TMDB API key"
+              aria-label="TMDB API key"
+            />
+            <div class="label" style="margin-top: 10px;">Trakt API Credentials</div>
+            <input
+              id="traktClientId"
+              name="traktClientId"
+              type="text"
+              placeholder="Paste Trakt Client ID"
+              aria-label="Trakt Client ID"
+            />
+            <input
+              id="traktClientSecret"
+              name="traktClientSecret"
+              type="text"
+              placeholder="Paste Trakt Client Secret"
+              aria-label="Trakt Client Secret"
+              style="margin-top: 8px;"
+            />
+            <input
+              id="traktAccessToken"
+              name="traktAccessToken"
+              type="text"
+              placeholder="Paste Trakt Access Token"
+              aria-label="Trakt Access Token"
+              style="margin-top: 8px;"
+            />
+            <div class="label" style="margin-top: 10px;">OpenSubtitles API Key</div>
+            <input
+              id="opensubtitlesKey"
+              name="opensubtitlesApiKey"
+              type="text"
+              placeholder="Paste OpenSubtitles API key"
+              aria-label="OpenSubtitles API key"
+            />
+            <button type="submit">Save</button>
+            <div id="configMsg" class="note" aria-live="polite"></div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        const origin = window.location.origin;
+        const manifestUrl = origin + "/manifest.json";
+        const installUrl = "stremio://addon-install?url=" + encodeURIComponent(manifestUrl);
+        const manifestSpan = document.getElementById("manifestUrl");
+        const installLink = document.getElementById("stremioInstall");
+        const copyBtn = document.getElementById("copyManifest");
+        const tabs = Array.from(document.querySelectorAll(".tab"));
+        const panels = Array.from(document.querySelectorAll(".tab-panel"));
+
+        manifestSpan.textContent = manifestUrl;
+        installLink.href = installUrl;
+
+        copyBtn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(manifestUrl);
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => (copyBtn.textContent = "Copy"), 1400);
+          } catch (e) {
+            copyBtn.textContent = "Failed";
+            setTimeout(() => (copyBtn.textContent = "Copy"), 1400);
+          }
+        });
+
+        const form = document.getElementById("addonForm");
+        const urlInput = document.getElementById("addonUrl");
+        const nameInput = document.getElementById("addonName");
+        const categoryInput = document.getElementById("addonCategory");
+        const msg = document.getElementById("addonMsg");
+        const list = document.getElementById("addonList");
+        const cacheListTv = document.getElementById("cacheListTv");
+        const cacheListMovie = document.getElementById("cacheListMovie");
+        const refreshCacheBtn = document.getElementById("refreshCache");
+        const logList = document.getElementById("logList");
+        const refreshLogsBtn = document.getElementById("refreshLogs");
+        const clearLogsBtn = document.getElementById("clearLogs");
+        const liveLogsToggle = document.getElementById("liveLogs");
+        const tmdbInput = document.getElementById("tmdbKey");
+        const configForm = document.getElementById("configForm");
+        const configMsg = document.getElementById("configMsg");
+        const traktClientIdInput = document.getElementById("traktClientId");
+        const traktClientSecretInput = document.getElementById("traktClientSecret");
+        const traktAccessTokenInput = document.getElementById("traktAccessToken");
+        const opensubtitlesInput = document.getElementById("opensubtitlesKey");
+        const traktInput = document.getElementById("traktKey");
+        const recentList = document.getElementById("recentList");
+        const refreshRecentBtn = document.getElementById("refreshRecent");
+        const timelineSummary = document.getElementById("timelineSummary");
+        const timelineErrorsBody = document.getElementById("timelineErrorsBody");
+        const cacheDetailPanel = document.getElementById("cacheDetailPanel");
+        const backFromCacheDetail = document.getElementById("backFromCacheDetail");
+        const cacheDetailTitle = document.getElementById("cacheDetailTitle");
+        const cacheDetailMeta = document.getElementById("cacheDetailMeta");
+        const cacheDetailList = document.getElementById("cacheDetailList");
+        const inbuiltList = document.getElementById("inbuiltList");
+        const enableAllBuiltins = document.getElementById("enableAllBuiltins");
+        const disableAllBuiltins = document.getElementById("disableAllBuiltins");
+
+        const renderAddons = (addons) => {
+          list.innerHTML = "";
+          const groups = {
+            streams: [],
+            catalog: [],
+            meta: [],
+            subtitles: [],
+            other: []
+          };
+          (addons || []).forEach((addon) => {
+            const cat = addon.category && groups[addon.category] ? addon.category : "other";
+            groups[cat].push(addon);
+          });
+          const groupOrder = [
+            ["streams", "Streams"],
+            ["catalog", "Catalog"],
+            ["meta", "Meta"],
+            ["subtitles", "Subtitles"],
+            ["other", "Other"]
+          ];
+          const any = addons && addons.length > 0;
+          if (!any) {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = "No addons installed yet.";
+            list.appendChild(empty);
+            return;
+          }
+          groupOrder.forEach(([key, label]) => {
+            if (!groups[key].length) return;
+            const title = document.createElement("div");
+            title.className = "label";
+            title.textContent = label;
+            list.appendChild(title);
+            groups[key].forEach((addon) => {
+              const pill = document.createElement("div");
+              pill.className = "pill";
+              const left = document.createElement("div");
+              left.className = "pill-text";
+              left.innerHTML = `<strong>${addon.name || "Addon"}</strong><br /><span class="muted">${addon.manifestUrl}</span>`;
+              const actions = document.createElement("div");
+              actions.className = "pill-actions";
+              const open = document.createElement("a");
+              open.className = "button secondary pill-action";
+              open.textContent = "Open manifest";
+              open.href = addon.manifestUrl;
+              open.target = "_blank";
+              const remove = document.createElement("button");
+              remove.className = "button danger pill-action";
+              remove.type = "button";
+              remove.textContent = "Remove";
+              remove.addEventListener("click", async () => {
+                remove.disabled = true;
+                try {
+                  await fetch(`/api/addons/${encodeURIComponent(addon.id)}`, { method: "DELETE" });
+                  await fetchAddons();
+                } catch (_err) {
+                  remove.disabled = false;
+                }
+              });
+              actions.appendChild(open);
+              actions.appendChild(remove);
+              pill.appendChild(left);
+              pill.appendChild(actions);
+              list.appendChild(pill);
+            });
+          });
+        };
+
+        const renderCache = (entries) => {
+          cacheListTv.innerHTML = "";
+          cacheListMovie.innerHTML = "";
+          const tv = [];
+          const movies = [];
+          (entries || []).forEach((e) => {
+            const isTv = e.type === "series" || e.type === "tv";
+            (isTv ? tv : movies).push(e);
+          });
+
+          const renderGroup = (listEl, group) => {
+            if (!group || group.length === 0) {
+              const empty = document.createElement("div");
+              empty.className = "note";
+              empty.textContent = "No cache entries.";
+              listEl.appendChild(empty);
+              return;
+            }
+            group.forEach((entry) => {
+              const card = document.createElement("div");
+              card.className = "cache-card";
+              const bg = document.createElement("div");
+              bg.className = "bg";
+              if (entry.meta && entry.meta.poster) {
+                bg.style.backgroundImage = `url(${entry.meta.poster})`;
+              }
+              const overlay = document.createElement("div");
+              overlay.className = "overlay";
+              const content = document.createElement("div");
+              content.className = "content";
+              const title = document.createElement("div");
+              title.className = "title";
+              title.textContent = (entry.meta && entry.meta.title) || entry.metaId || entry.id;
+              const meta = document.createElement("div");
+              meta.className = "meta";
+              meta.textContent = `${entry.type || "unknown"} • ${entry.streamsCount || 0} stream(s) • ${entry.updatedAt || ""}`;
+              const actions = document.createElement("div");
+              actions.className = "actions";
+              const view = document.createElement("button");
+              view.className = "button secondary pill-action";
+              view.type = "button";
+              view.textContent = "View streams";
+              view.addEventListener("click", () => showCacheDetail(entry));
+              const remove = document.createElement("button");
+              remove.className = "button danger pill-action";
+              remove.type = "button";
+              remove.textContent = "Remove";
+              remove.addEventListener("click", async () => {
+                remove.disabled = true;
+                try {
+                  await fetch(`/api/cache/${encodeURIComponent(entry.id)}`, { method: "DELETE" });
+                  await fetchCache();
+                } catch (_err) {
+                  remove.disabled = false;
+                }
+              });
+              actions.appendChild(view);
+              actions.appendChild(remove);
+              content.appendChild(title);
+              content.appendChild(meta);
+              content.appendChild(actions);
+              card.appendChild(bg);
+              card.appendChild(overlay);
+              card.appendChild(content);
+              listEl.appendChild(card);
+            });
+          };
+
+          renderGroup(cacheListTv, tv);
+          renderGroup(cacheListMovie, movies);
+        };
+
+        const showCacheDetail = async (entry) => {
+          cacheDetailTitle.textContent = (entry.meta && entry.meta.title) || entry.metaId || entry.id;
+          cacheDetailMeta.textContent = `${entry.type || "unknown"} • ${entry.updatedAt || ""}`;
+          cacheDetailList.innerHTML = "Loading...";
+          cacheDetailPanel.style.display = "block";
+          try {
+            const res = await fetch(`/api/cache/${encodeURIComponent(entry.id)}`);
+            const data = await res.json();
+            const streams = data.streams || [];
+            if (!streams.length) {
+              cacheDetailList.textContent = "No streams cached.";
+              return;
+            }
+            cacheDetailList.innerHTML = "";
+            streams.forEach((s, idx) => {
+              const item = document.createElement("div");
+              item.className = "stream-item";
+              const t = document.createElement("div");
+              t.className = "title";
+              t.textContent = s.title || s.name || s.description || "Stream";
+              const m = document.createElement("div");
+              m.className = "meta";
+              m.textContent = s.url || s.externalUrl || "";
+              const rm = document.createElement("button");
+              rm.className = "button danger pill-action";
+              rm.type = "button";
+              rm.textContent = "Remove";
+              rm.addEventListener("click", async () => {
+                rm.disabled = true;
+                try {
+                  await fetch(`/api/cache/${encodeURIComponent(entry.id)}/streams/${encodeURIComponent(idx)}`, {
+                    method: "DELETE"
+                  });
+                  // refresh detail view
+                  await showCacheDetail(entry);
+                } catch (_err) {
+                  rm.disabled = false;
+                }
+              });
+              item.appendChild(t);
+              item.appendChild(m);
+              item.appendChild(rm);
+              cacheDetailList.appendChild(item);
+            });
+          } catch (_err) {
+            cacheDetailList.textContent = "Failed to load streams.";
+          }
+        };
+
+        backFromCacheDetail.addEventListener("click", () => {
+          cacheDetailPanel.style.display = "none";
+          cacheDetailList.innerHTML = "";
+        });
+
+        const renderRecent = (items) => {
+          recentList.innerHTML = "";
+          recentList.innerHTML = "";
+          if (!items || items.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = "No recent requests.";
+            recentList.appendChild(empty);
+            return;
+          }
+          items.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "cache-card";
+            const bg = document.createElement("div");
+            bg.className = "bg";
+            if (item.meta && item.meta.poster) bg.style.backgroundImage = `url(${item.meta.poster})`;
+            const overlay = document.createElement("div");
+            overlay.className = "overlay";
+            const content = document.createElement("div");
+            content.className = "content";
+            const title = document.createElement("div");
+            title.className = "title";
+            title.textContent = (item.meta && item.meta.title) || item.metaId || item.id;
+            const meta = document.createElement("div");
+            meta.className = "meta";
+            meta.textContent = `${item.type || "unknown"} • ${item.count || 0} requests • ${item.lastRequested || ""}`;
+            content.appendChild(title);
+            content.appendChild(meta);
+            card.appendChild(bg);
+            card.appendChild(overlay);
+            card.appendChild(content);
+            recentList.appendChild(card);
+          });
+        };
+
+        const fetchRecent = async () => {
+          const res = await fetch("/api/recent");
+          const data = await res.json();
+          renderRecent(data.recent || []);
+          const summary = data.summary || {};
+          timelineSummary.innerHTML = "";
+          const summaryItems = [
+            { label: "Requests", value: summary.totalRequests || 0 },
+            { label: "Unique IPs", value: summary.uniqueIps || 0 },
+            { label: "Errors", value: summary.totalErrors || 0 },
+            { label: "Avg Response (ms)", value: summary.avgResponseTime || 0 }
+          ];
+          summaryItems.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "summary-card";
+            const t = document.createElement("div");
+            t.className = "title";
+            t.textContent = item.label;
+            const v = document.createElement("div");
+            v.className = "value";
+            v.textContent = item.value;
+            card.appendChild(t);
+            card.appendChild(v);
+            timelineSummary.appendChild(card);
+          });
+
+          timelineErrorsBody.innerHTML = "";
+          const errors = data.errors || [];
+          if (errors.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = "No recent errors.";
+            timelineErrorsBody.appendChild(empty);
+          } else {
+            errors.forEach((err) => {
+              const row = document.createElement("div");
+              row.className = "table-row";
+              const ts = document.createElement("div");
+              ts.textContent = err.ts || "";
+              const ip = document.createElement("div");
+              ip.textContent = err.ip || "";
+              const method = document.createElement("div");
+              method.textContent = err.method || "";
+              const path = document.createElement("div");
+              path.textContent = err.path || "";
+              const status = document.createElement("div");
+              status.textContent = err.status || "";
+              row.appendChild(ts);
+              row.appendChild(ip);
+              row.appendChild(method);
+              row.appendChild(path);
+              row.appendChild(status);
+              timelineErrorsBody.appendChild(row);
+            });
+          }
+        };
+
+        const renderInbuilt = (catalogs) => {
+          inbuiltList.innerHTML = "";
+          if (!catalogs || catalogs.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = "No in-built catalogs found.";
+            inbuiltList.appendChild(empty);
+            return;
+          }
+          catalogs.forEach((cat) => {
+            const pill = document.createElement("div");
+            pill.className = "pill";
+            const left = document.createElement("div");
+            left.className = "pill-text";
+            const meta = `${cat.provider || ""} • ${cat.category || ""} • ${cat.type}`;
+            left.innerHTML = `<strong>${cat.name}</strong><br /><span class="muted">${meta}</span>`;
+            const actions = document.createElement("div");
+            actions.className = "pill-actions";
+            const toggle = document.createElement("input");
+            toggle.type = "checkbox";
+            toggle.checked = !!cat.enabled;
+            toggle.addEventListener("change", async () => {
+              toggle.disabled = true;
+              try {
+                await fetch("/api/builtins", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: cat.id, enabled: toggle.checked })
+                });
+              } finally {
+                toggle.disabled = false;
+              }
+            });
+            actions.appendChild(toggle);
+            pill.appendChild(left);
+            pill.appendChild(actions);
+            inbuiltList.appendChild(pill);
+          });
+        };
+
+        const fetchInbuilt = async () => {
+          const res = await fetch("/api/builtins");
+          const data = await res.json();
+          renderInbuilt(data.catalogs || []);
+        };
+
+        const setAllBuiltins = async (enabled) => {
+          const res = await fetch("/api/builtins");
+          const data = await res.json();
+          const cats = data.catalogs || [];
+          for (const cat of cats) {
+            await fetch("/api/builtins", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: cat.id, enabled })
+            });
+          }
+          await fetchInbuilt();
+        };
+
+        const fetchAddons = async () => {
+          const res = await fetch("/api/addons");
+          const data = await res.json();
+          renderAddons(data.addons || []);
+        };
+
+        const fetchCache = async () => {
+          const res = await fetch("/api/cache");
+          const data = await res.json();
+          renderCache(data.cache || []);
+        };
+
+        const renderLogs = (entries) => {
+          logList.innerHTML = "";
+          if (!entries || entries.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = "No logs yet.";
+            logList.appendChild(empty);
+            return;
+          }
+          entries.forEach((entry) => {
+            const pill = document.createElement("div");
+            pill.className = "pill";
+            const left = document.createElement("div");
+            left.className = "pill-text";
+            const meta = entry.meta ? JSON.stringify(entry.meta) : "";
+            left.innerHTML = `<strong>${entry.type || "log"}</strong> — ${entry.message || ""}<br /><span class="muted">${entry.ts || ""}</span><br /><span class="muted">${meta}</span>`;
+            pill.appendChild(left);
+            logList.appendChild(pill);
+          });
+        };
+
+        const fetchLogs = async () => {
+          const res = await fetch("/api/logs");
+          const data = await res.json();
+          renderLogs(data.logs || []);
+        };
+
+        let liveLogsInterval = null;
+        const startLiveLogs = () => {
+          if (liveLogsInterval) return;
+          liveLogsInterval = setInterval(() => {
+            fetchLogs().catch(() => {});
+          }, 2000);
+        };
+        const stopLiveLogs = () => {
+          if (liveLogsInterval) {
+            clearInterval(liveLogsInterval);
+            liveLogsInterval = null;
+          }
+        };
+
+        const fetchConfig = async () => {
+          const res = await fetch("/api/config");
+          const data = await res.json();
+          if (data.config && typeof data.config.tmdbApiKey === "string") {
+            tmdbInput.value = data.config.tmdbApiKey;
+          }
+          if (data.config && typeof data.config.traktClientId === "string") {
+            traktClientIdInput.value = data.config.traktClientId;
+          }
+          if (data.config && typeof data.config.traktClientSecret === "string") {
+            traktClientSecretInput.value = data.config.traktClientSecret;
+          }
+          if (data.config && typeof data.config.traktAccessToken === "string") {
+            traktAccessTokenInput.value = data.config.traktAccessToken;
+          }
+          if (data.config && typeof data.config.opensubtitlesApiKey === "string") {
+            opensubtitlesInput.value = data.config.opensubtitlesApiKey;
+          }
+        };
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const target = tab.getAttribute("data-tab");
+            tabs.forEach((t) => t.classList.toggle("active", t === tab));
+            panels.forEach((p) => p.classList.toggle("active", p.getAttribute("data-tab-panel") === target));
+            if (target === "inbuilt") fetchInbuilt().catch(() => {});
+            if (target === "timeline") fetchRecent().catch(() => {});
+            if (target === "addons") fetchAddons().catch(() => {});
+            if (target === "cached") fetchCache().catch(() => {});
+            if (target === "logs") {
+              fetchLogs().catch(() => {});
+              if (liveLogsToggle.checked) startLiveLogs();
+            } else {
+              stopLiveLogs();
+            }
+            if (target === "config") fetchConfig().catch(() => {});
+          });
+        });
+
+        refreshCacheBtn.addEventListener("click", () => fetchCache().catch(() => {}));
+        refreshRecentBtn.addEventListener("click", () => fetchRecent().catch(() => {}));
+        enableAllBuiltins.addEventListener("click", () => setAllBuiltins(true).catch(() => {}));
+        disableAllBuiltins.addEventListener("click", () => setAllBuiltins(false).catch(() => {}));
+        fetchInbuilt().catch(() => {});
+        refreshLogsBtn.addEventListener("click", () => fetchLogs().catch(() => {}));
+        liveLogsToggle.addEventListener("change", () => {
+          if (liveLogsToggle.checked) {
+            startLiveLogs();
+          } else {
+            stopLiveLogs();
+          }
+        });
+        clearLogsBtn.addEventListener("click", async () => {
+          clearLogsBtn.disabled = true;
+          try {
+            await fetch("/api/logs", { method: "DELETE" });
+            await fetchLogs();
+          } catch (_err) {
+            // ignore
+          } finally {
+            clearLogsBtn.disabled = false;
+          }
+        });
+
+        configForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          configMsg.textContent = "";
+          try {
+            const res = await fetch("/api/config", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                tmdbApiKey: tmdbInput.value,
+                traktClientId: traktClientIdInput.value,
+                traktClientSecret: traktClientSecretInput.value,
+                traktAccessToken: traktAccessTokenInput.value,
+                opensubtitlesApiKey: opensubtitlesInput.value
+              })
+            });
+            if (!res.ok) throw new Error("Failed to save");
+            configMsg.textContent = "Saved.";
+          } catch (_err) {
+            configMsg.textContent = "Failed to save.";
+          }
+        });
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          msg.textContent = "";
+          const body = {
+            url: urlInput.value,
+            name: nameInput.value,
+            category: categoryInput.value
+          };
+          try {
+            const res = await fetch("/api/addons", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to add addon");
+            msg.textContent = "Added.";
+            urlInput.value = "";
+            nameInput.value = "";
+            await fetchAddons();
+          } catch (err) {
+            msg.textContent = err.message || "Failed to add addon";
+          }
+        });
+
+        fetchAddons().catch(() => {});
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hubbio Login</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0f1116; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: #e8ecf2; }
+      .card { width: min(420px, 92vw); background: #131722; border: 1px solid #222733; border-radius: 16px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+      h1 { margin: 0 0 6px 0; font-size: 22px; }
+      .muted { color: #9ba4b5; font-size: 13px; margin-bottom: 12px; }
+      form { display: grid; gap: 10px; }
+      input { width: 100%; background: #0b0d12; border: 1px solid #1f2330; border-radius: 10px; padding: 12px 14px; color: #e8ecf2; font-size: 14px; outline: none; }
+      input:focus { border-color: #4fd1c5; box-shadow: 0 0 0 1px rgba(79,209,197,0.35); }
+      button { border: none; border-radius: 10px; padding: 12px 16px; font-weight: 600; cursor: pointer; color: #0f1116; background: linear-gradient(135deg, #4fd1c5, #38b2ac); }
+      .qr { width: 180px; height: 180px; background: #0b0d12; border: 1px solid #1f2330; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+      .panel { padding: 12px; border: 1px solid #222733; border-radius: 12px; background: #0b0d12; margin-top: 12px; }
+      .note { color: #9ba4b5; font-size: 13px; margin-top: 6px; }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Hubbio Login</h1>
+      <div class="muted">Enter your credentials to continue.</div>
+
+      <div id="setupPanel" class="panel hidden">
+        <div><strong>First-time setup</strong></div>
+        <div class="note">Scan the QR with an authenticator, then enter a password and TOTP code.</div>
+        <div id="qrBox" class="qr">Loading QR...</div>
+        <div class="note" id="secretText"></div>
+        <form id="setupForm">
+          <input id="setupPassword" type="password" placeholder="New password" required />
+          <input id="setupToken" type="text" placeholder="TOTP code" required />
+          <button type="submit">Finish Setup</button>
+          <div id="setupMsg" class="note"></div>
+        </form>
+      </div>
+
+      <div id="loginPanel" class="panel hidden">
+        <div><strong>Login</strong></div>
+        <form id="loginForm">
+          <input id="loginPassword" type="password" placeholder="Password" required />
+          <input id="loginToken" type="text" placeholder="TOTP code" required />
+          <button type="submit">Login</button>
+          <div id="loginMsg" class="note"></div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const setupPanel = document.getElementById("setupPanel");
+      const loginPanel = document.getElementById("loginPanel");
+      const qrBox = document.getElementById("qrBox");
+      const secretText = document.getElementById("secretText");
+      const setupForm = document.getElementById("setupForm");
+      const setupMsg = document.getElementById("setupMsg");
+      const loginForm = document.getElementById("loginForm");
+      const loginMsg = document.getElementById("loginMsg");
+
+      const loadStatus = async () => {
+        const res = await fetch("/auth/status");
+        const data = await res.json();
+        if (data.setupNeeded) {
+          setupPanel.classList.remove("hidden");
+          loginPanel.classList.add("hidden");
+          await loadSetupData();
+        } else {
+          loginPanel.classList.remove("hidden");
+          setupPanel.classList.add("hidden");
+        }
+      };
+
+      const loadSetupData = async () => {
+        const res = await fetch("/auth/setup-data");
+        const data = await res.json();
+        secretText.textContent = `Secret: ${data.secret || ""}`;
+        qrBox.innerHTML = "";
+        if (data.qr) {
+          const img = document.createElement("img");
+          img.src = data.qr;
+          img.style.width = "100%";
+          img.style.height = "100%";
+          qrBox.appendChild(img);
+        } else {
+          qrBox.textContent = data.otpauth || "Scan secret in your authenticator";
+        }
+      };
+
+      setupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setupMsg.textContent = "";
+        try {
+          const res = await fetch("/auth/setup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              password: document.getElementById("setupPassword").value,
+              token: document.getElementById("setupToken").value
+            })
+          });
+          if (!res.ok) throw new Error("Setup failed");
+          window.location = "/";
+        } catch (err) {
+          setupMsg.textContent = err.message || "Setup failed";
+        }
+      });
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        loginMsg.textContent = "";
+        try {
+          const res = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              password: document.getElementById("loginPassword").value,
+              token: document.getElementById("loginToken").value
+            })
+          });
+          if (!res.ok) throw new Error("Login failed");
+          window.location = "/";
+        } catch (err) {
+          loginMsg.textContent = err.message || "Login failed";
+        }
+      });
+
+      loadStatus().catch(() => {
+        setupPanel.classList.add("hidden");
+        loginPanel.classList.add("hidden");
+      });
+    </script>
+  </body>
+</html>
