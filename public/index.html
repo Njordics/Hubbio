@@ -169,6 +169,79 @@
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 12px;
       }
+      .subtabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+      .subtab {
+        border: 1px solid var(--border);
+        background: #0b0d12;
+        color: var(--text);
+        padding: 10px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+      }
+      .subtab.active {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: rgba(79, 209, 197, 0.08);
+      }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 14px;
+      }
+      .gallery-card {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        background: radial-gradient(circle at 20% 20%, rgba(79, 209, 197, 0.08), rgba(15, 17, 22, 0.95));
+        border: 1px solid var(--border);
+        min-height: 230px;
+        box-shadow: var(--shadow);
+      }
+      .gallery-card .bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        filter: brightness(0.55);
+        opacity: 0.9;
+        transform: scale(1.02);
+      }
+      .gallery-card .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+      }
+      .gallery-card .content {
+        position: relative;
+        z-index: 1;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        height: 100%;
+      }
+      .gallery-card .title { font-weight: 800; letter-spacing: 0.2px; }
+      .gallery-card .meta { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px; }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .gallery-card .actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+      .cache-tab-panel { display: none; }
+      .cache-tab-panel.active { display: grid; }
       .cache-card {
         position: relative;
         border-radius: 12px;
@@ -201,6 +274,30 @@
       .cache-card .title { font-weight: 700; }
       .cache-card .meta { color: var(--muted); font-size: 13px; }
       .cache-card .actions { margin-top: auto; }
+      .episode-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+      }
+      .episode-card {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #0b0d12;
+        display: grid;
+        gap: 6px;
+      }
+      .episode-card .title { font-weight: 700; }
+      .episode-card .meta { color: var(--muted); font-size: 13px; display: grid; gap: 2px; }
+      .episode-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .episode-header .title { font-weight: 800; font-size: 18px; }
+      .episode-header .meta { color: var(--muted); font-size: 13px; display: flex; gap: 8px; flex-wrap: wrap; }
       .stream-list { display: grid; gap: 10px; }
       .stream-item {
         border: 1px solid var(--border);
@@ -257,6 +354,60 @@
       .inline { display: flex; gap: 10px; flex-wrap: wrap; }
       .inline input { flex: 1; min-width: 200px; }
       .inline select { min-width: 160px; }
+      .terminal {
+        background: #0b0d12;
+        border: 1px solid #1f2330;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02), var(--shadow);
+        font-family: "SFMono-Regular", Consolas, ui-monospace, monospace;
+      }
+      .terminal-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: linear-gradient(90deg, #0f1116 0%, #0b0d12 100%);
+        border-bottom: 1px solid #1f2330;
+      }
+      .terminal-dots {
+        display: inline-flex;
+        gap: 6px;
+      }
+      .terminal-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+      }
+      .terminal-dot.red { background: #ff5f56; }
+      .terminal-dot.yellow { background: #ffbd2e; }
+      .terminal-dot.green { background: #27c93f; }
+      .terminal-title {
+        color: var(--muted);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+      }
+      .terminal-body {
+        padding: 12px;
+        max-height: 420px;
+        overflow-y: auto;
+        background: radial-gradient(circle at 10% 0%, rgba(79, 209, 197, 0.04), transparent 30%), #05070c;
+      }
+      .terminal-line {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 6px 0;
+        color: #d2f0e9;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      .terminal-line:last-child { border-bottom: none; }
+      .terminal-prompt { color: #5bd0c0; font-weight: 700; }
+      .terminal-text { color: #d2f0e9; word-break: break-all; }
+      .terminal-meta { color: #7aa5a0; font-size: 12px; }
+      .terminal-empty { color: var(--muted); padding: 12px 0; }
       @media (max-width: 640px) {
         header { flex-direction: column; align-items: flex-start; }
         .code { flex-direction: column; align-items: flex-start; }
@@ -388,18 +539,31 @@
 
       <section class="row tab-panel" data-tab-panel="cached">
         <div class="panel">
-          <div class="label">Cached Streams</div>
+          <div class="label">Cached Library</div>
           <div class="actions" style="margin: 0 0 12px 0;">
             <button id="refreshCache" type="button" class="secondary">Refresh</button>
           </div>
-          <div class="label">TV</div>
-          <div id="cacheListTv" class="grid"></div>
-          <div class="label" style="margin-top: 8px;">Movies</div>
-          <div id="cacheListMovie" class="grid"></div>
-          <div class="note">Cached streams are returned first; Hubbio skips querying external addons when cached results exist.</div>
+          <div class="subtabs" id="cacheTabs">
+            <button class="subtab active" data-cache-tab="tv">TV Shows</button>
+            <button class="subtab" data-cache-tab="movie">Movies</button>
+          </div>
+          <div id="cacheListTv" class="gallery-grid cache-tab-panel active"></div>
+          <div id="cacheListMovie" class="gallery-grid cache-tab-panel"></div>
+          <div class="note">Cached streams are returned first; Hubbio skips querying external addons when cached results exist. TV entries are grouped by show; drill into a show to see cached episodes and their streams.</div>
+        </div>
+        <div class="panel" id="cacheEpisodesPanel" style="display: none;">
+          <div class="label">Cached TV Show</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="backToCacheList" type="button" class="secondary">Back to library</button>
+          </div>
+          <div id="cacheEpisodesHeader" class="episode-header">
+            <div id="cacheEpisodeShowTitle" class="title"></div>
+            <div id="cacheEpisodeShowMeta" class="meta"></div>
+          </div>
+          <div id="cacheEpisodesList" class="episode-grid"></div>
         </div>
         <div class="panel" id="cacheDetailPanel" style="display: none;">
-          <div class="label">Cached Streams Detail</div>
+          <div class="label">Cached Streams</div>
           <div class="actions" style="margin: 0 0 12px 0;">
             <button id="backFromCacheDetail" type="button" class="secondary">Back</button>
           </div>
@@ -420,8 +584,18 @@
               Live
             </label>
           </div>
-          <div id="logList" class="list"></div>
-          <div class="note">Shows recent requests, cache hits, addon fetches, errors, and debug info.</div>
+          <div class="terminal" aria-live="polite">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="terminal-dot red"></span>
+                <span class="terminal-dot yellow"></span>
+                <span class="terminal-dot green"></span>
+              </div>
+              <div class="terminal-title">cockpit shell — hubbio</div>
+            </div>
+            <div id="logList" class="terminal-body" role="log"></div>
+          </div>
+          <div class="note">Console-style view of recent requests, cache hits, addon fetches, errors, and debug info.</div>
         </div>
       </section>
 
@@ -479,7 +653,7 @@
       (function () {
         const origin = window.location.origin;
         const manifestUrl = origin + "/manifest.json";
-        const installUrl = "stremio://addon-install?url=" + encodeURIComponent(manifestUrl);
+        const installUrl = "stremio://addon-install|url=" + encodeURIComponent(manifestUrl);
         const manifestSpan = document.getElementById("manifestUrl");
         const installLink = document.getElementById("stremioInstall");
         const copyBtn = document.getElementById("copyManifest");
@@ -508,6 +682,13 @@
         const list = document.getElementById("addonList");
         const cacheListTv = document.getElementById("cacheListTv");
         const cacheListMovie = document.getElementById("cacheListMovie");
+        const cacheTabs = Array.from(document.querySelectorAll("[data-cache-tab]"));
+        const cacheEpisodesPanel = document.getElementById("cacheEpisodesPanel");
+        const cacheEpisodesList = document.getElementById("cacheEpisodesList");
+        const cacheEpisodesHeader = document.getElementById("cacheEpisodesHeader");
+        const cacheEpisodeShowTitle = document.getElementById("cacheEpisodeShowTitle");
+        const cacheEpisodeShowMeta = document.getElementById("cacheEpisodeShowMeta");
+        const backToCacheList = document.getElementById("backToCacheList");
         const refreshCacheBtn = document.getElementById("refreshCache");
         const logList = document.getElementById("logList");
         const refreshLogsBtn = document.getElementById("refreshLogs");
@@ -533,6 +714,10 @@
         const inbuiltList = document.getElementById("inbuiltList");
         const enableAllBuiltins = document.getElementById("enableAllBuiltins");
         const disableAllBuiltins = document.getElementById("disableAllBuiltins");
+
+        let cacheEntries = [];
+        let tvGroups = [];
+        let selectedShowBase = null;
 
         const renderAddons = (addons) => {
           list.innerHTML = "";
@@ -603,81 +788,48 @@
           });
         };
 
-        const renderCache = (entries) => {
-          cacheListTv.innerHTML = "";
-          cacheListMovie.innerHTML = "";
-          const tv = [];
-          const movies = [];
-          (entries || []).forEach((e) => {
-            const isTv = e.type === "series" || e.type === "tv";
-            (isTv ? tv : movies).push(e);
-          });
+        const isTvEntry = (entry) => entry && (entry.type === "series" || entry.type === "tv");
 
-          const renderGroup = (listEl, group) => {
-            if (!group || group.length === 0) {
-              const empty = document.createElement("div");
-              empty.className = "note";
-              empty.textContent = "No cache entries.";
-              listEl.appendChild(empty);
-              return;
-            }
-            group.forEach((entry) => {
-              const card = document.createElement("div");
-              card.className = "cache-card";
-              const bg = document.createElement("div");
-              bg.className = "bg";
-              if (entry.meta && entry.meta.poster) {
-                bg.style.backgroundImage = `url(${entry.meta.poster})`;
-              }
-              const overlay = document.createElement("div");
-              overlay.className = "overlay";
-              const content = document.createElement("div");
-              content.className = "content";
-              const title = document.createElement("div");
-              title.className = "title";
-              title.textContent = (entry.meta && entry.meta.title) || entry.metaId || entry.id;
-              const meta = document.createElement("div");
-              meta.className = "meta";
-              meta.textContent = `${entry.type || "unknown"} • ${entry.streamsCount || 0} stream(s) • ${entry.updatedAt || ""}`;
-              const actions = document.createElement("div");
-              actions.className = "actions";
-              const view = document.createElement("button");
-              view.className = "button secondary pill-action";
-              view.type = "button";
-              view.textContent = "View streams";
-              view.addEventListener("click", () => showCacheDetail(entry));
-              const remove = document.createElement("button");
-              remove.className = "button danger pill-action";
-              remove.type = "button";
-              remove.textContent = "Remove";
-              remove.addEventListener("click", async () => {
-                remove.disabled = true;
-                try {
-                  await fetch(`/api/cache/${encodeURIComponent(entry.id)}`, { method: "DELETE" });
-                  await fetchCache();
-                } catch (_err) {
-                  remove.disabled = false;
-                }
-              });
-              actions.appendChild(view);
-              actions.appendChild(remove);
-              content.appendChild(title);
-              content.appendChild(meta);
-              content.appendChild(actions);
-              card.appendChild(bg);
-              card.appendChild(overlay);
-              card.appendChild(content);
-              listEl.appendChild(card);
-            });
+        const parseEpisodeMeta = (metaId) => {
+          const parts = String(metaId || "").split(":");
+          return {
+            base: parts[0] || "",
+            season: parts[1] || null,
+            episode: parts[2] || null
           };
-
-          renderGroup(cacheListTv, tv);
-          renderGroup(cacheListMovie, movies);
         };
 
-        const showCacheDetail = async (entry) => {
-          cacheDetailTitle.textContent = (entry.meta && entry.meta.title) || entry.metaId || entry.id;
-          cacheDetailMeta.textContent = `${entry.type || "unknown"} • ${entry.updatedAt || ""}`;
+        const formatEpisodeLabel = (metaId) => {
+          const { season, episode } = parseEpisodeMeta(metaId);
+          if (season && episode) {
+            const s = String(season).padStart(2, "0");
+            const e = String(episode).padStart(2, "0");
+            return `S${s}E${e}`;
+          }
+          if (season) return `Season ${season}`;
+          return "Episode";
+        };
+
+        const setCacheTab = (tab) => {
+          cacheTabs.forEach((btn) => btn.classList.toggle("active", btn.getAttribute("data-cache-tab") === tab));
+          cacheListTv.classList.toggle("active", tab === "tv");
+          cacheListMovie.classList.toggle("active", tab === "movie");
+        };
+
+        cacheTabs.forEach((btn) => btn.addEventListener("click", () => setCacheTab(btn.getAttribute("data-cache-tab"))));
+        setCacheTab("tv");
+
+        const showCacheDetail = async (entry, opts = {}) => {
+          const labelParts = [];
+          if (opts.showTitle) labelParts.push(opts.showTitle);
+          if (isTvEntry(entry)) {
+            const epLabel = formatEpisodeLabel(entry.metaId);
+            if (epLabel) labelParts.push(epLabel);
+          }
+          const displayTitle =
+            labelParts.join(" - ") || (entry.meta && entry.meta.title) || entry.metaId || entry.id || "Cached entry";
+          cacheDetailTitle.textContent = displayTitle;
+          cacheDetailMeta.textContent = `${entry.type || "unknown"} | ${entry.updatedAt || ""}`;
           cacheDetailList.innerHTML = "Loading...";
           cacheDetailPanel.style.display = "block";
           try {
@@ -708,8 +860,7 @@
                   await fetch(`/api/cache/${encodeURIComponent(entry.id)}/streams/${encodeURIComponent(idx)}`, {
                     method: "DELETE"
                   });
-                  // refresh detail view
-                  await showCacheDetail(entry);
+                  await showCacheDetail(entry, opts);
                 } catch (_err) {
                   rm.disabled = false;
                 }
@@ -728,6 +879,239 @@
           cacheDetailPanel.style.display = "none";
           cacheDetailList.innerHTML = "";
         });
+
+        const buildTvGroups = (entries) => {
+          const map = new Map();
+          (entries || []).forEach((entry) => {
+            const parts = parseEpisodeMeta(entry.metaId);
+            const base = parts.base || entry.metaId || entry.id;
+            const existing =
+              map.get(base) || {
+                base,
+                title: (entry.meta && entry.meta.title) || entry.metaId || "TV Show",
+                poster: (entry.meta && entry.meta.poster) || "",
+                updatedAt: entry.updatedAt,
+                episodes: []
+              };
+            if (!existing.poster && entry.meta && entry.meta.poster) existing.poster = entry.meta.poster;
+            if ((!existing.title || existing.title === "TV Show") && entry.meta && entry.meta.title) existing.title = entry.meta.title;
+            existing.episodes.push({ ...entry, season: parts.season, episode: parts.episode });
+            const current = new Date(existing.updatedAt || 0);
+            const incoming = new Date(entry.updatedAt || 0);
+            if (!existing.updatedAt || incoming > current) existing.updatedAt = entry.updatedAt;
+            map.set(base, existing);
+          });
+          const groups = Array.from(map.values());
+          groups.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+          return groups;
+        };
+
+        const renderEpisodes = (show) => {
+          selectedShowBase = show.base;
+          cacheEpisodeShowTitle.textContent = show.title || "TV Show";
+          const totalStreams = show.episodes.reduce((sum, ep) => sum + (ep.streamsCount || 0), 0);
+          cacheEpisodeShowMeta.textContent = `${show.episodes.length} episode(s) | ${totalStreams} stream(s) | ${show.updatedAt || ""}`;
+          cacheEpisodesList.innerHTML = "";
+          const sorted = [...show.episodes].sort((a, b) => {
+            const pa = parseEpisodeMeta(a.metaId);
+            const pb = parseEpisodeMeta(b.metaId);
+            const sa = Number(pa.season) || 0;
+            const sb = Number(pb.season) || 0;
+            if (sa !== sb) return sa - sb;
+            const ea = Number(pa.episode) || 0;
+            const eb = Number(pb.episode) || 0;
+            return ea - eb;
+          });
+          if (!sorted.length) {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = "No cached episodes.";
+            cacheEpisodesList.appendChild(empty);
+            return;
+          }
+          sorted.forEach((entry) => {
+            const card = document.createElement("div");
+            card.className = "episode-card";
+            const title = document.createElement("div");
+            title.className = "title";
+            title.textContent = formatEpisodeLabel(entry.metaId);
+            const meta = document.createElement("div");
+            meta.className = "meta";
+            meta.innerHTML = `<span>${entry.streamsCount || 0} stream(s)</span><span>${entry.updatedAt || ""}</span>`;
+            const actions = document.createElement("div");
+            actions.className = "actions";
+            const view = document.createElement("button");
+            view.className = "button secondary pill-action";
+            view.type = "button";
+            view.textContent = "View cached";
+            view.addEventListener("click", () => showCacheDetail(entry, { showTitle: show.title }));
+            const remove = document.createElement("button");
+            remove.className = "button danger pill-action";
+            remove.type = "button";
+            remove.textContent = "Remove episode";
+            remove.addEventListener("click", async () => {
+              remove.disabled = true;
+              try {
+                await fetch(`/api/cache/${encodeURIComponent(entry.id)}`, { method: "DELETE" });
+                await fetchCache({ reopenShow: true });
+              } catch (_err) {
+                remove.disabled = false;
+              }
+            });
+            actions.appendChild(view);
+            actions.appendChild(remove);
+            card.appendChild(title);
+            card.appendChild(meta);
+            card.appendChild(actions);
+            cacheEpisodesList.appendChild(card);
+          });
+          cacheEpisodesPanel.style.display = "block";
+          setCacheTab("tv");
+        };
+
+        backToCacheList.addEventListener("click", () => {
+          cacheEpisodesPanel.style.display = "none";
+          selectedShowBase = null;
+        });
+
+        const renderCache = (entries) => {
+          cacheEntries = entries || [];
+          const tv = cacheEntries.filter(isTvEntry);
+          const movies = cacheEntries.filter((e) => !isTvEntry(e));
+          tvGroups = buildTvGroups(tv);
+
+          cacheListTv.innerHTML = "";
+          cacheListMovie.innerHTML = "";
+
+          const renderEmpty = (listEl, message) => {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = message;
+            listEl.appendChild(empty);
+          };
+
+          if (!tvGroups.length) {
+            renderEmpty(cacheListTv, "No cached TV shows.");
+          } else {
+            tvGroups.forEach((show) => {
+              const card = document.createElement("div");
+              card.className = "gallery-card";
+              const bg = document.createElement("div");
+              bg.className = "bg";
+              if (show.poster) bg.style.backgroundImage = `url(${show.poster})`;
+              const overlay = document.createElement("div");
+              overlay.className = "overlay";
+              const content = document.createElement("div");
+              content.className = "content";
+              const title = document.createElement("div");
+              title.className = "title";
+              title.textContent = show.title || "TV Show";
+              const meta = document.createElement("div");
+              meta.className = "meta";
+              const streamsTotal = show.episodes.reduce((sum, ep) => sum + (ep.streamsCount || 0), 0);
+              meta.innerHTML = `
+                <span class="chip">${show.episodes.length} episode(s)</span>
+                <span class="chip">${streamsTotal} stream(s)</span>
+                <span class="chip">${show.updatedAt || ""}</span>
+              `;
+              const actions = document.createElement("div");
+              actions.className = "actions";
+              const view = document.createElement("button");
+              view.className = "button";
+              view.type = "button";
+              view.textContent = "View episodes";
+              view.addEventListener("click", () => renderEpisodes(show));
+              const remove = document.createElement("button");
+              remove.className = "button danger pill-action";
+              remove.type = "button";
+              remove.textContent = "Remove show";
+              remove.addEventListener("click", async () => {
+                remove.disabled = true;
+                try {
+                  const deletions = show.episodes.map((ep) =>
+                    fetch(`/api/cache/${encodeURIComponent(ep.id)}`, { method: "DELETE" })
+                  );
+                  await Promise.all(deletions);
+                  selectedShowBase = null;
+                  await fetchCache();
+                } catch (_err) {
+                  remove.disabled = false;
+                }
+              });
+              actions.appendChild(view);
+              actions.appendChild(remove);
+              content.appendChild(title);
+              content.appendChild(meta);
+              content.appendChild(actions);
+              card.appendChild(bg);
+              card.appendChild(overlay);
+              card.appendChild(content);
+              cacheListTv.appendChild(card);
+            });
+          }
+
+          if (!movies.length) {
+            renderEmpty(cacheListMovie, "No cached movies.");
+          } else {
+            movies.forEach((entry) => {
+              const card = document.createElement("div");
+              card.className = "gallery-card";
+              const bg = document.createElement("div");
+              bg.className = "bg";
+              if (entry.meta && entry.meta.poster) bg.style.backgroundImage = `url(${entry.meta.poster})`;
+              const overlay = document.createElement("div");
+              overlay.className = "overlay";
+              const content = document.createElement("div");
+              content.className = "content";
+              const title = document.createElement("div");
+              title.className = "title";
+              title.textContent = (entry.meta && entry.meta.title) || entry.metaId || entry.id;
+              const meta = document.createElement("div");
+              meta.className = "meta";
+              meta.innerHTML = `
+                <span class="chip">${entry.streamsCount || 0} stream(s)</span>
+                <span class="chip">${entry.updatedAt || ""}</span>
+              `;
+              const actions = document.createElement("div");
+              actions.className = "actions";
+              const view = document.createElement("button");
+              view.className = "button secondary pill-action";
+              view.type = "button";
+              view.textContent = "View cached";
+              view.addEventListener("click", () => showCacheDetail(entry));
+              const remove = document.createElement("button");
+              remove.className = "button danger pill-action";
+              remove.type = "button";
+              remove.textContent = "Remove";
+              remove.addEventListener("click", async () => {
+                remove.disabled = true;
+                try {
+                  await fetch(`/api/cache/${encodeURIComponent(entry.id)}`, { method: "DELETE" });
+                  await fetchCache();
+                } catch (_err) {
+                  remove.disabled = false;
+                }
+              });
+              actions.appendChild(view);
+              actions.appendChild(remove);
+              content.appendChild(title);
+              content.appendChild(meta);
+              content.appendChild(actions);
+              card.appendChild(bg);
+              card.appendChild(overlay);
+              card.appendChild(content);
+              cacheListMovie.appendChild(card);
+            });
+          }
+
+          const activeShow = selectedShowBase && tvGroups.find((g) => g.base === selectedShowBase);
+          if (activeShow) {
+            renderEpisodes(activeShow);
+          } else {
+            cacheEpisodesPanel.style.display = "none";
+          }
+        };
+
 
         const renderRecent = (items) => {
           recentList.innerHTML = "";
@@ -754,7 +1138,7 @@
             title.textContent = (item.meta && item.meta.title) || item.metaId || item.id;
             const meta = document.createElement("div");
             meta.className = "meta";
-            meta.textContent = `${item.type || "unknown"} • ${item.count || 0} requests • ${item.lastRequested || ""}`;
+            meta.textContent = `${item.type || "unknown"} | ${item.count || 0} requests | ${item.lastRequested || ""}`;
             content.appendChild(title);
             content.appendChild(meta);
             card.appendChild(bg);
@@ -835,7 +1219,7 @@
             pill.className = "pill";
             const left = document.createElement("div");
             left.className = "pill-text";
-            const meta = `${cat.provider || ""} • ${cat.category || ""} • ${cat.type}`;
+            const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
             left.innerHTML = `<strong>${cat.name}</strong><br /><span class="muted">${meta}</span>`;
             const actions = document.createElement("div");
             actions.className = "pill-actions";
@@ -887,7 +1271,7 @@
           renderAddons(data.addons || []);
         };
 
-        const fetchCache = async () => {
+        const fetchCache = async (_opts = {}) => {
           const res = await fetch("/api/cache");
           const data = await res.json();
           renderCache(data.cache || []);
@@ -897,21 +1281,41 @@
           logList.innerHTML = "";
           if (!entries || entries.length === 0) {
             const empty = document.createElement("div");
-            empty.className = "note";
-            empty.textContent = "No logs yet.";
+            empty.className = "terminal-empty";
+            empty.textContent = "waiting for logs...";
             logList.appendChild(empty);
             return;
           }
           entries.forEach((entry) => {
-            const pill = document.createElement("div");
-            pill.className = "pill";
-            const left = document.createElement("div");
-            left.className = "pill-text";
+            const line = document.createElement("div");
+            line.className = "terminal-line";
+
+            const prompt = document.createElement("span");
+            prompt.className = "terminal-prompt";
+            prompt.textContent = "cockpit@hubbio:~$";
+
+            const text = document.createElement("div");
+            text.className = "terminal-text";
+            const stamp = document.createElement("span");
+            stamp.style.color = "#7aa5a0";
+            stamp.textContent = `[${entry.ts || ""}] `;
+            const main = document.createElement("span");
+            main.textContent = `${entry.type || "log"}: ${entry.message || ""}`;
+            text.appendChild(stamp);
+            text.appendChild(main);
             const meta = entry.meta ? JSON.stringify(entry.meta) : "";
-            left.innerHTML = `<strong>${entry.type || "log"}</strong> — ${entry.message || ""}<br /><span class="muted">${entry.ts || ""}</span><br /><span class="muted">${meta}</span>`;
-            pill.appendChild(left);
-            logList.appendChild(pill);
+            if (meta) {
+              const metaLine = document.createElement("div");
+              metaLine.className = "terminal-meta";
+              metaLine.textContent = meta;
+              text.appendChild(metaLine);
+            }
+
+            line.appendChild(prompt);
+            line.appendChild(text);
+            logList.appendChild(line);
           });
+          logList.scrollTop = logList.scrollHeight;
         };
 
         const fetchLogs = async () => {
