@@ -854,8 +854,22 @@ app.post("/auth/logout", (req, res) => {
   });
 });
 
-// Web UI (gated by auth toggle)
-app.use(requireSession, express.static("public"));
+// Web UI (gate only human-facing pages; never block Stremio endpoints)
+app.use((req, res, next) => {
+  const p = req.path || "";
+  if (
+    p.startsWith("/stream/") ||
+    p.startsWith("/catalog/") ||
+    p.startsWith("/meta/") ||
+    p.startsWith("/subtitles/") ||
+    p === "/manifest.json" ||
+    p.startsWith("/manifest")
+  ) {
+    return next();
+  }
+  return requireSession(req, res, next);
+});
+app.use(express.static("public"));
 
 // Addons API (install external scrapers/manifest URLs)
 app.get("/api/addons", requireWebAuth, (_req, res) => {
