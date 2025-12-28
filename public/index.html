@@ -454,6 +454,7 @@
         <button class="tab" data-tab="addons">Addons</button>
         <button class="tab" data-tab="inbuilt">In-Built</button>
         <button class="tab" data-tab="timeline">Timeline</button>
+        <button class="tab" data-tab="errors">Errors</button>
         <button class="tab" data-tab="cached">Cached</button>
         <button class="tab" data-tab="logs">Logs</button>
         <button class="tab" data-tab="config">Config</button>
@@ -547,7 +548,16 @@
           <div id="timelineSummary" class="summary-grid"></div>
           <div class="label" style="margin-top: 10px;">Recently Requested</div>
           <div id="recentList" class="grid"></div>
-          <div class="label" style="margin-top: 14px;">Recent Errors</div>
+          <div class="note">Shows most recent stream requests and stats across Hubbio.</div>
+        </div>
+      </section>
+
+      <section class="row tab-panel" data-tab-panel="errors">
+        <div class="panel">
+          <div class="label">Recent Errors</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="refreshErrors" type="button" class="secondary">Refresh</button>
+          </div>
           <div id="timelineErrors" class="table">
             <div class="table-head">
               <div>Time</div>
@@ -558,7 +568,7 @@
             </div>
             <div id="timelineErrorsBody"></div>
           </div>
-          <div class="note">Shows most recent stream requests and stats across Hubbio.</div>
+          <div class="note">Shows most recent errors across Hubbio.</div>
         </div>
       </section>
 
@@ -746,6 +756,7 @@
         const traktInput = document.getElementById("traktKey");
         const recentList = document.getElementById("recentList");
         const refreshRecentBtn = document.getElementById("refreshRecent");
+        const refreshErrorsBtn = document.getElementById("refreshErrors");
         const timelineSummary = document.getElementById("timelineSummary");
         const timelineErrorsBody = document.getElementById("timelineErrorsBody");
         const cacheDetailPanel = document.getElementById("cacheDetailPanel");
@@ -1589,7 +1600,7 @@
             tabs.forEach((t) => t.classList.toggle("active", t === tab));
             panels.forEach((p) => p.classList.toggle("active", p.getAttribute("data-tab-panel") === target));
             if (target === "inbuilt") fetchInbuilt().catch(() => {});
-            if (target === "timeline") fetchRecent().catch(() => {});
+            if (target === "timeline" || target === "errors") fetchRecent().catch(() => {});
             if (target === "addons") fetchAddons().catch(() => {});
             if (target === "cached") fetchCache().catch(() => {});
             if (target === "logs") {
@@ -1604,6 +1615,7 @@
 
         refreshCacheBtn.addEventListener("click", () => fetchCache().catch(() => {}));
         refreshRecentBtn.addEventListener("click", () => fetchRecent().catch(() => {}));
+        if (refreshErrorsBtn) refreshErrorsBtn.addEventListener("click", () => fetchRecent().catch(() => {}));
         enableAllBuiltins.addEventListener("click", () => setAllBuiltins(true).catch(() => {}));
         disableAllBuiltins.addEventListener("click", () => setAllBuiltins(false).catch(() => {}));
         fetchInbuilt().catch(() => {});
