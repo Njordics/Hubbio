@@ -199,6 +199,34 @@
         text-shadow: 0 0 8px rgba(86,30,131,0.45);
         pointer-events: none;
       }
+      .pill.apple {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(15,15,15,0.85), rgba(0,0,0,0.95));
+        border-color: #1c1c1c;
+      }
+      .pill.apple::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0)),
+          radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 35%);
+        pointer-events: none;
+      }
+      .pill.apple::after {
+        content: " tv";
+        position: absolute;
+        right: -24px;
+        top: -10px;
+        transform: rotate(28deg);
+        font-weight: 800;
+        letter-spacing: 3px;
+        color: rgba(255,255,255,0.25);
+        font-size: 26px;
+        text-shadow: 0 0 8px rgba(255,255,255,0.1);
+        pointer-events: none;
+      }
       .pill .pill-text {
         flex: 1;
         min-width: 0;
@@ -1503,6 +1531,7 @@
             pill.className = "pill";
             if (cat.provider === "trakt") pill.classList.add("trakt");
             if (cat.provider === "max") pill.classList.add("max");
+            if (cat.provider === "apple") pill.classList.add("apple");
             const left = document.createElement("div");
             left.className = "pill-text";
             const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
