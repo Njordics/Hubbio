@@ -144,6 +144,33 @@
         color: var(--text);
         overflow: hidden;
       }
+      .pill.trakt {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(0,0,0,0.65), rgba(0,0,0,0.9));
+        border-color: #222;
+      }
+      .pill.trakt::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(135deg, rgba(229,57,53,0.25), rgba(229,57,53,0)),
+          linear-gradient(315deg, rgba(229,57,53,0.18), rgba(0,0,0,0));
+        pointer-events: none;
+      }
+      .pill.trakt::after {
+        content: "TRAKT";
+        position: absolute;
+        right: -28px;
+        top: -10px;
+        transform: rotate(35deg);
+        font-weight: 800;
+        letter-spacing: 8px;
+        color: rgba(229,57,53,0.35);
+        font-size: 28px;
+        pointer-events: none;
+      }
       .pill .pill-text {
         flex: 1;
         min-width: 0;
@@ -1446,6 +1473,7 @@
           catalogs.forEach((cat) => {
             const pill = document.createElement("div");
             pill.className = "pill";
+            if (cat.provider === "trakt") pill.classList.add("trakt");
             const left = document.createElement("div");
             left.className = "pill-text";
             const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
