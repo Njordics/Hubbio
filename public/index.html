@@ -255,6 +255,34 @@
         text-shadow: 0 0 10px rgba(0,181,241,0.35);
         pointer-events: none;
       }
+      .pill.hulu {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(0,32,24,0.85), rgba(0,16,12,0.95));
+        border-color: #0c2f2a;
+      }
+      .pill.hulu::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(135deg, rgba(0,186,124,0.25), rgba(0,0,0,0)),
+          radial-gradient(circle at 22% 24%, rgba(0,255,180,0.08), transparent 40%);
+        pointer-events: none;
+      }
+      .pill.hulu::after {
+        content: "hulu";
+        position: absolute;
+        right: -26px;
+        top: -8px;
+        transform: rotate(27deg);
+        font-weight: 900;
+        letter-spacing: 4px;
+        color: rgba(0,255,180,0.3);
+        font-size: 22px;
+        text-shadow: 0 0 10px rgba(0,255,180,0.35);
+        pointer-events: none;
+      }
       .pill .pill-text {
         flex: 1;
         min-width: 0;
@@ -1561,6 +1589,7 @@
             if (cat.provider === "max") pill.classList.add("max");
             if (cat.provider === "apple") pill.classList.add("apple");
             if (cat.provider === "prime") pill.classList.add("prime");
+            if (cat.provider === "hulu") pill.classList.add("hulu");
             const left = document.createElement("div");
             left.className = "pill-text";
             const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
