@@ -311,6 +311,34 @@
         text-shadow: 0 0 10px rgba(120,170,255,0.45);
         pointer-events: none;
       }
+      .pill.netflix {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(12,12,12,0.9), rgba(0,0,0,0.95));
+        border-color: #1c1c1c;
+      }
+      .pill.netflix::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(135deg, rgba(255,0,41,0.22), rgba(0,0,0,0)),
+          linear-gradient(315deg, rgba(255,0,41,0.18), rgba(0,0,0,0.05));
+        pointer-events: none;
+      }
+      .pill.netflix::after {
+        content: "NETFLIX";
+        position: absolute;
+        right: -34px;
+        top: -12px;
+        transform: rotate(30deg);
+        font-weight: 900;
+        letter-spacing: 6px;
+        color: rgba(255,0,41,0.32);
+        font-size: 24px;
+        text-shadow: 0 0 12px rgba(255,0,41,0.45);
+        pointer-events: none;
+      }
       .pill .pill-text {
         flex: 1;
         min-width: 0;
@@ -1619,6 +1647,7 @@
             if (cat.provider === "prime") pill.classList.add("prime");
             if (cat.provider === "hulu") pill.classList.add("hulu");
             if (cat.provider === "disney") pill.classList.add("disney");
+            if (cat.provider === "netflix") pill.classList.add("netflix");
             const left = document.createElement("div");
             left.className = "pill-text";
             const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
