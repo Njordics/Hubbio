@@ -339,6 +339,34 @@
         text-shadow: 0 0 12px rgba(255,0,41,0.45);
         pointer-events: none;
       }
+      .pill.global {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(9,32,46,0.85), rgba(2,12,18,0.95));
+        border-color: #123040;
+      }
+      .pill.global::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 25% 25%, rgba(0,180,230,0.12), transparent 45%),
+          linear-gradient(135deg, rgba(0,144,200,0.2), rgba(0,0,0,0));
+        pointer-events: none;
+      }
+      .pill.global::after {
+        content: "🌐 GLOBAL";
+        position: absolute;
+        right: -32px;
+        top: -10px;
+        transform: rotate(27deg);
+        font-weight: 800;
+        letter-spacing: 4px;
+        color: rgba(0,200,255,0.28);
+        font-size: 22px;
+        text-shadow: 0 0 10px rgba(0,200,255,0.35);
+        pointer-events: none;
+      }
       .pill .pill-text {
         flex: 1;
         min-width: 0;
@@ -1648,6 +1676,7 @@
             if (cat.provider === "hulu") pill.classList.add("hulu");
             if (cat.provider === "disney") pill.classList.add("disney");
             if (cat.provider === "netflix") pill.classList.add("netflix");
+            if (cat.provider === "global") pill.classList.add("global");
             const left = document.createElement("div");
             left.className = "pill-text";
             const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
