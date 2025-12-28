@@ -274,18 +274,43 @@
       .cache-card .title { font-weight: 700; }
       .cache-card .meta { color: var(--muted); font-size: 13px; }
       .cache-card .actions { margin-top: auto; }
-      .episode-grid {
+      .season-grid, .episode-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
         gap: 12px;
       }
-      .episode-card {
-        border: 1px solid var(--border);
+      .season-card, .episode-card {
+        position: relative;
+        overflow: hidden;
         border-radius: 12px;
-        padding: 12px;
+        border: 1px solid var(--border);
         background: #0b0d12;
+        min-height: 160px;
+        box-shadow: var(--shadow);
+      }
+      .season-card .bg, .episode-card .bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        filter: brightness(0.55);
+        opacity: 0.85;
+        transform: scale(1.03);
+      }
+      .season-card .overlay, .episode-card .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.78) 100%);
+      }
+      .season-card .content, .episode-card .content {
+        position: relative;
+        z-index: 1;
+        padding: 12px;
         display: grid;
         gap: 6px;
+      }
+      .episode-card {
+        min-height: 150px;
       }
       .episode-card .title { font-weight: 700; }
       .episode-card .meta { color: var(--muted); font-size: 13px; display: grid; gap: 2px; }
@@ -538,7 +563,7 @@
       </section>
 
       <section class="row tab-panel" data-tab-panel="cached">
-        <div class="panel">
+        <div class="panel" id="cacheLibraryPanel">
           <div class="label">Cached Library</div>
           <div class="actions" style="margin: 0 0 12px 0;">
             <button id="refreshCache" type="button" class="secondary">Refresh</button>
@@ -549,12 +574,23 @@
           </div>
           <div id="cacheListTv" class="gallery-grid cache-tab-panel active"></div>
           <div id="cacheListMovie" class="gallery-grid cache-tab-panel"></div>
-          <div class="note">Cached streams are returned first; Hubbio skips querying external addons when cached results exist. TV entries are grouped by show; drill into a show to see cached episodes and their streams.</div>
+          <div class="note">Cached streams are returned first; Hubbio skips querying external addons when cached results exist. TV entries are grouped by show; drill into a show to view seasons, then episodes and cached streams.</div>
         </div>
-        <div class="panel" id="cacheEpisodesPanel" style="display: none;">
-          <div class="label">Cached TV Show</div>
+        <div class="panel" id="cacheSeasonsPanel" style="display: none;">
+          <div class="label">TV Show Seasons</div>
           <div class="actions" style="margin: 0 0 12px 0;">
             <button id="backToCacheList" type="button" class="secondary">Back to library</button>
+          </div>
+          <div id="cacheSeasonsHeader" class="episode-header">
+            <div id="cacheSeasonsShowTitle" class="title"></div>
+            <div id="cacheSeasonsShowMeta" class="meta"></div>
+          </div>
+          <div id="cacheSeasonsList" class="season-grid"></div>
+        </div>
+        <div class="panel" id="cacheEpisodesPanel" style="display: none;">
+          <div class="label">Season Episodes</div>
+          <div class="actions" style="margin: 0 0 12px 0;">
+            <button id="backToSeasons" type="button" class="secondary">Back to seasons</button>
           </div>
           <div id="cacheEpisodesHeader" class="episode-header">
             <div id="cacheEpisodeShowTitle" class="title"></div>
@@ -591,7 +627,7 @@
                 <span class="terminal-dot yellow"></span>
                 <span class="terminal-dot green"></span>
               </div>
-              <div class="terminal-title">cockpit shell — hubbio</div>
+              <div class="terminal-title">Hubbio Logs</div>
             </div>
             <div id="logList" class="terminal-body" role="log"></div>
           </div>
@@ -680,15 +716,21 @@
         const categoryInput = document.getElementById("addonCategory");
         const msg = document.getElementById("addonMsg");
         const list = document.getElementById("addonList");
+        const cacheLibraryPanel = document.getElementById("cacheLibraryPanel");
         const cacheListTv = document.getElementById("cacheListTv");
         const cacheListMovie = document.getElementById("cacheListMovie");
         const cacheTabs = Array.from(document.querySelectorAll("[data-cache-tab]"));
+        const cacheSeasonsPanel = document.getElementById("cacheSeasonsPanel");
+        const cacheSeasonsList = document.getElementById("cacheSeasonsList");
+        const cacheSeasonsShowTitle = document.getElementById("cacheSeasonsShowTitle");
+        const cacheSeasonsShowMeta = document.getElementById("cacheSeasonsShowMeta");
         const cacheEpisodesPanel = document.getElementById("cacheEpisodesPanel");
         const cacheEpisodesList = document.getElementById("cacheEpisodesList");
         const cacheEpisodesHeader = document.getElementById("cacheEpisodesHeader");
         const cacheEpisodeShowTitle = document.getElementById("cacheEpisodeShowTitle");
         const cacheEpisodeShowMeta = document.getElementById("cacheEpisodeShowMeta");
         const backToCacheList = document.getElementById("backToCacheList");
+        const backToSeasons = document.getElementById("backToSeasons");
         const refreshCacheBtn = document.getElementById("refreshCache");
         const logList = document.getElementById("logList");
         const refreshLogsBtn = document.getElementById("refreshLogs");
@@ -718,6 +760,7 @@
         let cacheEntries = [];
         let tvGroups = [];
         let selectedShowBase = null;
+        let selectedSeason = null;
 
         const renderAddons = (addons) => {
           list.innerHTML = "";
@@ -810,6 +853,11 @@
           return "Episode";
         };
 
+        const formatSeasonLabel = (season) => {
+          if (!season) return "Season";
+          return `Season ${String(season).padStart(2, "0")}`;
+        };
+
         const setCacheTab = (tab) => {
           cacheTabs.forEach((btn) => btn.classList.toggle("active", btn.getAttribute("data-cache-tab") === tab));
           cacheListTv.classList.toggle("active", tab === "tv");
@@ -819,6 +867,44 @@
         cacheTabs.forEach((btn) => btn.addEventListener("click", () => setCacheTab(btn.getAttribute("data-cache-tab"))));
         setCacheTab("tv");
 
+        const pickImage = (item) => {
+          const meta = (item && item.meta) || item || {};
+          return meta.seasonPoster || meta.background || meta.poster || meta.thumb || meta.image || "";
+        };
+
+        const hideCacheDetail = () => {
+          cacheDetailPanel.style.display = "none";
+          cacheDetailList.innerHTML = "";
+        };
+
+        const showLibraryView = () => {
+          cacheLibraryPanel.style.display = "block";
+          cacheSeasonsPanel.style.display = "none";
+          cacheEpisodesPanel.style.display = "none";
+          hideCacheDetail();
+        };
+
+        const showSeasonsView = () => {
+          cacheLibraryPanel.style.display = "none";
+          cacheSeasonsPanel.style.display = "block";
+          cacheEpisodesPanel.style.display = "none";
+          hideCacheDetail();
+        };
+
+        const showEpisodesView = () => {
+          cacheLibraryPanel.style.display = "none";
+          cacheSeasonsPanel.style.display = "none";
+          cacheEpisodesPanel.style.display = "block";
+          hideCacheDetail();
+        };
+
+        const showStreamsView = () => {
+          cacheLibraryPanel.style.display = "none";
+          cacheSeasonsPanel.style.display = "none";
+          cacheEpisodesPanel.style.display = "none";
+          cacheDetailPanel.style.display = "block";
+        };
+
         const showCacheDetail = async (entry, opts = {}) => {
           const labelParts = [];
           if (opts.showTitle) labelParts.push(opts.showTitle);
@@ -826,12 +912,11 @@
             const epLabel = formatEpisodeLabel(entry.metaId);
             if (epLabel) labelParts.push(epLabel);
           }
-          const displayTitle =
-            labelParts.join(" - ") || (entry.meta && entry.meta.title) || entry.metaId || entry.id || "Cached entry";
+          const displayTitle = labelParts.join(" - ") || (entry.meta && entry.meta.title) || entry.metaId || entry.id || "Cached entry";
           cacheDetailTitle.textContent = displayTitle;
           cacheDetailMeta.textContent = `${entry.type || "unknown"} | ${entry.updatedAt || ""}`;
           cacheDetailList.innerHTML = "Loading...";
-          cacheDetailPanel.style.display = "block";
+          showStreamsView();
           try {
             const res = await fetch(`/api/cache/${encodeURIComponent(entry.id)}`);
             const data = await res.json();
@@ -857,9 +942,7 @@
               rm.addEventListener("click", async () => {
                 rm.disabled = true;
                 try {
-                  await fetch(`/api/cache/${encodeURIComponent(entry.id)}/streams/${encodeURIComponent(idx)}`, {
-                    method: "DELETE"
-                  });
+                  await fetch(`/api/cache/${encodeURIComponent(entry.id)}/streams/${encodeURIComponent(idx)}`, { method: "DELETE" });
                   await showCacheDetail(entry, opts);
                 } catch (_err) {
                   rm.disabled = false;
@@ -876,8 +959,19 @@
         };
 
         backFromCacheDetail.addEventListener("click", () => {
-          cacheDetailPanel.style.display = "none";
-          cacheDetailList.innerHTML = "";
+          hideCacheDetail();
+          if (selectedShowBase) {
+            const activeShow = tvGroups.find((g) => g.base === selectedShowBase);
+            if (activeShow) {
+              if (selectedSeason) {
+                renderSeasonEpisodes(activeShow, selectedSeason);
+                return;
+              }
+              renderSeasons(activeShow);
+              return;
+            }
+          }
+          showLibraryView();
         });
 
         const buildTvGroups = (entries) => {
@@ -906,18 +1000,107 @@
           return groups;
         };
 
-        const renderEpisodes = (show) => {
+        const buildSeasonGroups = (episodes) => {
+          const map = new Map();
+          (episodes || []).forEach((entry) => {
+            const { season } = parseEpisodeMeta(entry.metaId);
+            const key = season || "0";
+            const bucket = map.get(key) || [];
+            bucket.push(entry);
+            map.set(key, bucket);
+          });
+          return Array.from(map.entries())
+            .map(([season, eps]) => ({
+              season,
+              episodes: eps,
+              streams: eps.reduce((sum, ep) => sum + (ep.streamsCount || 0), 0),
+              updatedAt: eps.reduce((latest, ep) => {
+                const ts = new Date(ep.updatedAt || 0);
+                const cur = latest ? new Date(latest) : null;
+                return !cur || ts > cur ? ep.updatedAt : latest;
+              }, null)
+            }))
+            .sort((a, b) => (Number(a.season) || 0) - (Number(b.season) || 0));
+        };
+
+        const renderSeasons = (show, opts = {}) => {
           selectedShowBase = show.base;
-          cacheEpisodeShowTitle.textContent = show.title || "TV Show";
+          selectedSeason = null;
+          setCacheTab("tv");
+          const seasons = buildSeasonGroups(show.episodes);
           const totalStreams = show.episodes.reduce((sum, ep) => sum + (ep.streamsCount || 0), 0);
-          cacheEpisodeShowMeta.textContent = `${show.episodes.length} episode(s) | ${totalStreams} stream(s) | ${show.updatedAt || ""}`;
+          cacheSeasonsShowTitle.textContent = show.title || "TV Show";
+          cacheSeasonsShowMeta.textContent = `${seasons.length} season(s) | ${show.episodes.length} episode(s) | ${totalStreams} stream(s)`;
+          cacheSeasonsList.innerHTML = "";
+          if (!seasons.length) {
+            const empty = document.createElement("div");
+            empty.className = "note";
+            empty.textContent = "No cached seasons.";
+            cacheSeasonsList.appendChild(empty);
+            showSeasonsView();
+            return;
+          }
+          seasons.forEach((season) => {
+            const poster =
+              season.episodes.map((ep) => pickImage(ep)).find(Boolean) ||
+              show.poster ||
+              pickImage(show);
+            const card = document.createElement("div");
+            card.className = "season-card";
+            if (poster) {
+              const bg = document.createElement("div");
+              bg.className = "bg";
+              bg.style.backgroundImage = `url(${poster})`;
+              card.appendChild(bg);
+            }
+            const overlay = document.createElement("div");
+            overlay.className = "overlay";
+            const content = document.createElement("div");
+            content.className = "content";
+            const title = document.createElement("div");
+            title.className = "title";
+            title.textContent = formatSeasonLabel(season.season);
+            const meta = document.createElement("div");
+            meta.className = "meta";
+            meta.innerHTML = `<span>${season.episodes.length} episode(s)</span><span>${season.streams || 0} stream(s)</span><span>${season.updatedAt || ""}</span>`;
+            const actions = document.createElement("div");
+            actions.className = "actions";
+            const view = document.createElement("button");
+            view.className = "button secondary pill-action";
+            view.type = "button";
+            view.textContent = "Open season";
+            view.addEventListener("click", () => renderSeasonEpisodes(show, season.season));
+            actions.appendChild(view);
+            content.appendChild(title);
+            content.appendChild(meta);
+            content.appendChild(actions);
+            card.appendChild(overlay);
+            card.appendChild(content);
+            cacheSeasonsList.appendChild(card);
+          });
+          showSeasonsView();
+          if (opts.selectedSeason) {
+            const hasSeason = seasons.some((s) => (s.season || null) === opts.selectedSeason);
+            if (hasSeason) renderSeasonEpisodes(show, opts.selectedSeason);
+          }
+        };
+
+        const renderSeasonEpisodes = (show, season) => {
+          selectedShowBase = show.base;
+          selectedSeason = season;
+          setCacheTab("tv");
+          const seasonLabel = formatSeasonLabel(season);
+          const episodes = (show.episodes || []).filter((ep) => {
+            const parsed = parseEpisodeMeta(ep.metaId);
+            return (parsed.season || "0") === (season || "0");
+          });
+          const totalStreams = episodes.reduce((sum, ep) => sum + (ep.streamsCount || 0), 0);
+          cacheEpisodeShowTitle.textContent = `${show.title || "TV Show"} - ${seasonLabel}`;
+          cacheEpisodeShowMeta.textContent = `${episodes.length} episode(s) | ${totalStreams} stream(s)`;
           cacheEpisodesList.innerHTML = "";
-          const sorted = [...show.episodes].sort((a, b) => {
+          const sorted = [...episodes].sort((a, b) => {
             const pa = parseEpisodeMeta(a.metaId);
             const pb = parseEpisodeMeta(b.metaId);
-            const sa = Number(pa.season) || 0;
-            const sb = Number(pb.season) || 0;
-            if (sa !== sb) return sa - sb;
             const ea = Number(pa.episode) || 0;
             const eb = Number(pb.episode) || 0;
             return ea - eb;
@@ -927,6 +1110,7 @@
             empty.className = "note";
             empty.textContent = "No cached episodes.";
             cacheEpisodesList.appendChild(empty);
+            showEpisodesView();
             return;
           }
           sorted.forEach((entry) => {
@@ -953,25 +1137,48 @@
               remove.disabled = true;
               try {
                 await fetch(`/api/cache/${encodeURIComponent(entry.id)}`, { method: "DELETE" });
-                await fetchCache({ reopenShow: true });
+                await fetchCache({ reopenShow: true, reopenSeason: season });
               } catch (_err) {
                 remove.disabled = false;
               }
             });
             actions.appendChild(view);
             actions.appendChild(remove);
-            card.appendChild(title);
-            card.appendChild(meta);
-            card.appendChild(actions);
+            const poster = pickImage(entry) || pickImage(show);
+            if (poster) {
+              const bg = document.createElement("div");
+              bg.className = "bg";
+              bg.style.backgroundImage = `url(${poster})`;
+              card.appendChild(bg);
+            }
+            const overlay = document.createElement("div");
+            overlay.className = "overlay";
+            const content = document.createElement("div");
+            content.className = "content";
+            content.appendChild(title);
+            content.appendChild(meta);
+            content.appendChild(actions);
+            card.appendChild(overlay);
+            card.appendChild(content);
             cacheEpisodesList.appendChild(card);
           });
-          cacheEpisodesPanel.style.display = "block";
-          setCacheTab("tv");
+          showEpisodesView();
         };
 
         backToCacheList.addEventListener("click", () => {
-          cacheEpisodesPanel.style.display = "none";
           selectedShowBase = null;
+          selectedSeason = null;
+          showLibraryView();
+        });
+
+        backToSeasons.addEventListener("click", () => {
+          const activeShow = selectedShowBase && tvGroups.find((g) => g.base === selectedShowBase);
+          if (activeShow) {
+            renderSeasons(activeShow);
+            return;
+          }
+          selectedSeason = null;
+          showLibraryView();
         });
 
         const renderCache = (entries) => {
@@ -1019,8 +1226,8 @@
               const view = document.createElement("button");
               view.className = "button";
               view.type = "button";
-              view.textContent = "View episodes";
-              view.addEventListener("click", () => renderEpisodes(show));
+              view.textContent = "View seasons";
+              view.addEventListener("click", () => renderSeasons(show));
               const remove = document.createElement("button");
               remove.className = "button danger pill-action";
               remove.type = "button";
@@ -1033,6 +1240,8 @@
                   );
                   await Promise.all(deletions);
                   selectedShowBase = null;
+                  selectedSeason = null;
+                  showLibraryView();
                   await fetchCache();
                 } catch (_err) {
                   remove.disabled = false;
@@ -1106,12 +1315,21 @@
 
           const activeShow = selectedShowBase && tvGroups.find((g) => g.base === selectedShowBase);
           if (activeShow) {
-            renderEpisodes(activeShow);
+            if (selectedSeason) {
+              const seasons = buildSeasonGroups(activeShow.episodes);
+              const hasSeason = seasons.some((s) => (s.season || null) === selectedSeason);
+              if (hasSeason) {
+                renderSeasonEpisodes(activeShow, selectedSeason);
+              } else {
+                renderSeasons(activeShow);
+              }
+            } else {
+              renderSeasons(activeShow);
+            }
           } else {
-            cacheEpisodesPanel.style.display = "none";
+            showLibraryView();
           }
         };
-
 
         const renderRecent = (items) => {
           recentList.innerHTML = "";
@@ -1271,9 +1489,16 @@
           renderAddons(data.addons || []);
         };
 
-        const fetchCache = async (_opts = {}) => {
+        const fetchCache = async (opts = {}) => {
           const res = await fetch("/api/cache");
           const data = await res.json();
+          if (opts.reopenShow && opts.reopenSeason && selectedShowBase) {
+            selectedSeason = opts.reopenSeason;
+          } else if (opts.reopenShow) {
+            // keep selectedShowBase as-is; renderCache will reopen
+          } else {
+            selectedSeason = opts.reopenSeason || selectedSeason;
+          }
           renderCache(data.cache || []);
         };
 
@@ -1292,7 +1517,7 @@
 
             const prompt = document.createElement("span");
             prompt.className = "terminal-prompt";
-            prompt.textContent = "cockpit@hubbio:~$";
+            prompt.textContent = "martinriggs@hubbio:~$";
 
             const text = document.createElement("div");
             text.className = "terminal-text";
