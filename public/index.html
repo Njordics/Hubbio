@@ -171,6 +171,34 @@
         font-size: 28px;
         pointer-events: none;
       }
+      .pill.max {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(61,13,95,0.7), rgba(20,8,35,0.95));
+        border-color: #301348;
+      }
+      .pill.max::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%),
+          linear-gradient(135deg, rgba(99,38,153,0.35), rgba(15,0,30,0.2));
+        pointer-events: none;
+      }
+      .pill.max::after {
+        content: "HBO  MAX";
+        position: absolute;
+        right: -38px;
+        top: -6px;
+        transform: rotate(30deg);
+        font-weight: 900;
+        letter-spacing: 6px;
+        color: rgba(255,255,255,0.22);
+        font-size: 24px;
+        text-shadow: 0 0 8px rgba(86,30,131,0.45);
+        pointer-events: none;
+      }
       .pill .pill-text {
         flex: 1;
         min-width: 0;
@@ -1474,6 +1502,7 @@
             const pill = document.createElement("div");
             pill.className = "pill";
             if (cat.provider === "trakt") pill.classList.add("trakt");
+            if (cat.provider === "max") pill.classList.add("max");
             const left = document.createElement("div");
             left.className = "pill-text";
             const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
