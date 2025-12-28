@@ -283,6 +283,34 @@
         text-shadow: 0 0 10px rgba(0,255,180,0.35);
         pointer-events: none;
       }
+      .pill.disney {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #0b1f3a, #040a14);
+        border-color: #0f2b50;
+      }
+      .pill.disney::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 25% 25%, rgba(82,137,255,0.2), transparent 45%),
+          linear-gradient(135deg, rgba(31,82,255,0.25), rgba(0,0,0,0));
+        pointer-events: none;
+      }
+      .pill.disney::after {
+        content: "Disney+";
+        position: absolute;
+        right: -30px;
+        top: -10px;
+        transform: rotate(26deg);
+        font-weight: 800;
+        letter-spacing: 4px;
+        color: rgba(120,170,255,0.32);
+        font-size: 22px;
+        text-shadow: 0 0 10px rgba(120,170,255,0.45);
+        pointer-events: none;
+      }
       .pill .pill-text {
         flex: 1;
         min-width: 0;
@@ -1590,6 +1618,7 @@
             if (cat.provider === "apple") pill.classList.add("apple");
             if (cat.provider === "prime") pill.classList.add("prime");
             if (cat.provider === "hulu") pill.classList.add("hulu");
+            if (cat.provider === "disney") pill.classList.add("disney");
             const left = document.createElement("div");
             left.className = "pill-text";
             const meta = `${cat.provider || ""} | ${cat.category || ""} | ${cat.type}`;
